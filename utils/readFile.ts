@@ -40,7 +40,7 @@ const processRowsInChunks = async (
   rows: string[],
   headers: string[],
   jsonData: any[],
-  chunkSize = 100
+  chunkSize = 1000
 ) => {
   for (let i = 0; i < rows.length; i += chunkSize) {
     await new Promise((resolve) => {
