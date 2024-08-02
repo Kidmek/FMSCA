@@ -16,7 +16,7 @@ const CustomDataTable: React.FC<DataTableProps> = ({ data }) => {
   })
   const [pagination, setPagination] = useState({
     total: data.length,
-    pageSize: 20,
+    pageSize: 15,
     currentPage: 0,
   })
 
@@ -25,9 +25,9 @@ const CustomDataTable: React.FC<DataTableProps> = ({ data }) => {
     { width: 200, title: 'Modified_DT', key: 'data_source_modified_dt' },
     { width: 100, title: 'Entity', key: 'entity_type' },
     { width: 150, title: 'Operating status', key: 'operating_status' },
-    { width: 200, title: 'Legal name', key: 'legal_name' },
+    { width: 250, title: 'Legal name', key: 'legal_name' },
     { width: 200, title: 'DBA name', key: 'dba_name' },
-    { width: 200, title: 'Physical address', key: 'physical_address' },
+    { width: 250, title: 'Physical address', key: 'physical_address' },
     { width: 150, title: 'Phone', key: 'phone' },
     { width: 100, title: 'DOT', key: 'usdot_number' },
     { width: 100, title: 'MC/MX/FF', key: 'mc_mx_ff_number' },
@@ -85,7 +85,7 @@ const CustomDataTable: React.FC<DataTableProps> = ({ data }) => {
               }}
               key={h.key}
             >
-              {d[h.key]}
+              {d[h.key].replace('"', '')}
             </DataTable.Cell>
           )
         })}
@@ -160,13 +160,13 @@ const CustomDataTable: React.FC<DataTableProps> = ({ data }) => {
             })}
           </DataTable.Header>
           <FlatList
-            data={filteredData.slice(start, end)}
+            data={filteredData.slice(start - 1, end)}
             renderItem={renderItem}
           />
         </DataTable>
       </ScrollView>
 
-      {end < pagination.total && (
+      {pagination.total > pagination.pageSize && (
         <DataTable.Pagination
           page={pagination.currentPage}
           numberOfPages={Math.ceil(pagination.total / pagination.pageSize)}

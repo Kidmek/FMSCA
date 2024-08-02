@@ -1,30 +1,56 @@
-import * as XLSX from 'xlsx'
 import * as FileSystem from 'expo-file-system'
+import Papa from 'papaparse'
 import { Asset } from 'expo-asset'
-const CHUNK_SIZE = 1024 ** 2 * 1
 
 export const readExcelFile = async (): Promise<any[] | undefined> => {
   const started = new Date()
+  let jsonData: any[] = []
+  let headers: string[] | null = []
   try {
     console.log('Started Reading')
     const asset = Asset.fromModule(require(`../assets/data.csv`))
     await asset.downloadAsync()
     const fileUri = asset.localUri || ''
     const file = await FileSystem.readAsStringAsync(fileUri, {
-      encoding: FileSystem.EncodingType.Base64,
+      encoding: FileSystem.EncodingType.UTF8,
       // length: CHUNK_SIZE,
       // position:0
     })
+
     console.log('File Read As String', file.length, getTime(started))
-    const workbook = XLSX.read(file, {
-      type: 'base64',
-      dense: true,
-      WTF: true,
-      // sheetRows:20
-    })
-    console.log('XLSX read finished', getTime(started))
-    const worksheet = workbook.Sheets[workbook.SheetNames[0]]
-    const jsonData = XLSX.utils.sheet_to_json(worksheet)
+
+    if (file.length) {
+      // ~19s
+      // Papa.parse(file, {
+      //   complete: (results) => {
+      //     if (results.data.length) {
+      //       console.log('Parse Result', results.data.length)
+      //       jsonData = results.data
+      //     }
+      //     if (results.errors.length) {
+      //       console.log('Parse Error')
+      //       console.log(results.errors)
+      //     }
+      //   },
+      //   header: true,
+      // })
+      const rows = file.split('\n')
+      console.log('Rows', rows.length)
+      const firstRow = rows.shift()
+      if (firstRow) {
+        headers = splitComma(firstRow)
+      }
+      if (headers?.length) {
+        rows.map((row) => {
+          const rowJson: any = {}
+          splitComma(row)?.map((cell, index) => {
+            rowJson[headers![index]] = cell
+          })
+          jsonData.push(rowJson)
+        })
+      }
+    }
+
     console.log('Finished Reading', jsonData.length, getTime(started))
     return jsonData
   } catch (err) {
@@ -34,5 +60,12 @@ export const readExcelFile = async (): Promise<any[] | undefined> => {
 }
 
 const getTime = (started: Date) => {
-  return (new Date().getTime() - started.getTime()) / 1000
+  return `${(new Date().getTime() - started.getTime()) / 1000} seconds `
+}
+
+function splitComma(str: string) {
+  return str.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+  // .map((refi) =>
+  //   refi.replace(/[\x00-\x08\x0E-\x1F\x7F-\uFFFF"\""]/g, '').trim()
+  // )
 }
