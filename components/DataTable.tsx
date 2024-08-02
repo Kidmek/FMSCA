@@ -70,10 +70,8 @@ const CustomDataTable: React.FC<DataTableProps> = ({ data }) => {
         style={styles.tableRow}
         onPress={() => {
           router.push({
-            pathname: '/details/[index]',
-            params: {
-              index: d.id,
-            },
+            pathname: '/details',
+            params: d,
           })
         }}
       >

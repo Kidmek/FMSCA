@@ -3,10 +3,10 @@ import React from 'react'
 import { useLocalSearchParams } from 'expo-router'
 
 export default function Details() {
-  const { index } = useLocalSearchParams()
+  const data = useLocalSearchParams()
   return (
     <View>
-      <Text>details {index}</Text>
+      <Text>details {data.id}</Text>
     </View>
   )
 }
