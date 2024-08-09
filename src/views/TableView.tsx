@@ -1,15 +1,27 @@
-import DataTable from '../components/DataTable'
-import DataChart from '../components/DataChart'
+import { Box } from '@mui/material'
 import useTableState from '../hoooks/useTableState'
+import { DataGrid } from '@mui/x-data-grid'
 
 const TableView = () => {
-  const { columns, data, setColumns } = useTableState()
+  const { columns, rows, setColumns } = useTableState()
 
   return (
-    <>
-      <DataTable columns={columns} data={data} setColumns={setColumns} />
-      {/* <DataChart data={data} /> */}
-    </>
+    <Box sx={{ height: 'auto', width: '100vw' }}>
+      <DataGrid
+        onColumnHeaderDoubleClick={(params) => {
+          console.log(params)
+        }}
+        rows={rows}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: { page: 0, pageSize: 5 },
+          },
+        }}
+        pageSizeOptions={[5, 10]}
+        checkboxSelection
+      />
+    </Box>
   )
 }
 
