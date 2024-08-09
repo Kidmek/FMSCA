@@ -34,35 +34,84 @@ export type TruckingCompany = {
   record_status: string
 }
 const formatDate = (date: string) => {
-  return new Date(date).toUTCString()
+  const dateObj = new Date(date)
+  if (dateObj.getTime()) {
+    return new Date(date)
+  }
 }
 
 const headers: GridColDef<TruckingCompany>[] = [
   {
     width: 200,
+    headerName: 'ID',
+    field: 'id',
+  },
+  {
+    width: 200,
     headerName: 'Created_DT',
     field: 'created_dt',
     valueGetter: formatDate,
+    editable: true,
+    type: 'dateTime',
   },
   {
     width: 200,
     headerName: 'Modified_DT',
     field: 'data_source_modified_dt',
     valueGetter: formatDate,
+    editable: true,
+    type: 'dateTime',
   },
-  { width: 100, headerName: 'Entity', field: 'entity_type' },
-  { width: 150, headerName: 'Operating status', field: 'operating_status' },
-  { width: 200, headerName: 'Legal name', field: 'legal_name' },
-  { width: 200, headerName: 'DBA name', field: 'dba_name' },
-  { width: 200, headerName: 'Physical address', field: 'physical_address' },
-  { width: 150, headerName: 'Phone', field: 'phone' },
-  { width: 100, headerName: 'DOT', field: 'usdot_number' },
-  { width: 100, headerName: 'MC/MX/FF', field: 'mc_mx_ff_number' },
-  { width: 100, headerName: 'Power units', field: 'power_units' },
+  { width: 100, headerName: 'Entity', field: 'entity_type', editable: true },
+  {
+    width: 150,
+    headerName: 'Operating status',
+    field: 'operating_status',
+    editable: true,
+  },
+  { width: 200, headerName: 'Legal name', field: 'legal_name', editable: true },
+  { width: 200, headerName: 'DBA name', field: 'dba_name', editable: true },
+  {
+    width: 200,
+    headerName: 'Physical address',
+    field: 'physical_address',
+    editable: true,
+  },
+  {
+    width: 150,
+    headerName: 'Phone',
+    field: 'phone',
+    editable: true,
+    type: 'number',
+  },
+  {
+    width: 100,
+    headerName: 'DOT',
+    field: 'usdot_number',
+    editable: true,
+    type: 'number',
+  },
+  {
+    width: 100,
+    headerName: 'MC/MX/FF',
+    field: 'mc_mx_ff_number',
+    editable: true,
+    type: 'custom',
+  },
+  {
+    width: 100,
+    headerName: 'Power units',
+    field: 'power_units',
+    editable: true,
+    type: 'number',
+  },
   {
     width: 200,
     headerName: 'Out of service date',
     field: 'out_of_service_date',
+    editable: true,
+    valueGetter: formatDate,
+    type: 'date',
   },
 ]
 
@@ -71,20 +120,21 @@ const useTableState = () => {
   const [rows, setRows] = useState<TruckingCompany[]>([])
 
   useEffect(() => {
-    parse('/data.csv', {
-      header: true,
-      download: true,
-      complete: (results) => {
-        setRows(results.data as TruckingCompany[])
-
-        console.log(results)
-      },
-      error: (error) => {
-        console.error('Error parsing CSV:', error)
-      },
-    })
+    console.log('Table State Use Effect', rows.length)
+    if (!rows.length) {
+      parse('/data.csv', {
+        header: true,
+        download: true,
+        complete: (results) => {
+          setRows(results.data as TruckingCompany[])
+          console.log(results)
+        },
+        error: (error) => {
+          console.error('Error parsing CSV:', error)
+        },
+      })
+    }
   }, [])
-  // Handle table state management (sorting, filtering, column resizing, etc.)
 
   return { columns, rows, setColumns }
 }
