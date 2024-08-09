@@ -23,8 +23,8 @@ import {
   useLayoutEffect,
   useCallback,
 } from 'react'
-import useTableState from '../hoooks/useTableState'
-import { useNavigate } from 'react-router-dom'
+import useTableState, { headers } from '../hoooks/useTableState'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 const chartSetting = {
   xAxis: [
@@ -46,7 +46,30 @@ const STORAGE_KEY = {
   COLUMNS: 'IS_colOrder',
 }
 
+export const monthNames = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
+
+function encodeData(data) {
+  return btoa(encodeURIComponent(JSON.stringify(data)))
+}
+
+function decodeData(encodedData) {
+  return JSON.parse(decodeURIComponent(atob(encodedData)))
+}
 const TableView = () => {
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const apiRef = useGridApiRef()
   const { columns, rows, setColumns } = useTableState()
@@ -79,20 +102,6 @@ const TableView = () => {
     }
 
     // Map month numbers to month names
-    const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ]
 
     // Create the result array
     return Array.from(monthCounts.entries()).map(([month, count]) => ({
@@ -177,15 +186,24 @@ const TableView = () => {
   }, [apiRef])
 
   useLayoutEffect(() => {
-    const stateFromLocalStorage = localStorage?.getItem(STORAGE_KEY.STATE)
-    const columnsFromLocalStorage = localStorage?.getItem(STORAGE_KEY.COLUMNS)
+    let state = null
+    let columns = null
+    if (searchParams.size == 1) {
+      const data = decodeData(searchParams.get('data'))
+      state = data[STORAGE_KEY.STATE]
+      columns = data[STORAGE_KEY.COLUMNS]
+      setInitialState(state ? state : {})
+    } else {
+      state = localStorage?.getItem(STORAGE_KEY.STATE)
+      columns = localStorage?.getItem(STORAGE_KEY.COLUMNS)
+      state = state ? JSON.parse(state) : {}
+      columns = columns ? JSON.parse(columns) : {}
+    }
+    setInitialState(state ? state : {})
 
-    setInitialState(
-      stateFromLocalStorage ? JSON.parse(stateFromLocalStorage) : {}
-    )
-    if (columnsFromLocalStorage) {
-      const reorderedColumns = (JSON.parse(columnsFromLocalStorage) as string[])
-        .map((field) => columns.find((col) => col.field === field))
+    if (columns) {
+      const reorderedColumns = (columns as string[])
+        .map((field) => headers.find((col) => col.field === field))
         .filter((col) => col !== undefined)
       setColumns(reorderedColumns)
     }
@@ -229,6 +247,22 @@ const TableView = () => {
         onClick={() => navigate('/pivot')}
       >
         Go to Pivot View
+      </Button>
+      <Button
+        variant='contained'
+        color='primary'
+        onClick={() => {
+          if (apiRef?.current?.exportState) {
+            const data = {
+              [STORAGE_KEY.STATE]: apiRef.current.exportState(),
+              [STORAGE_KEY.COLUMNS]: columns.map((c) => c.field),
+            }
+
+            console.log(`${location.origin}?data=${encodeData(data)}`)
+          }
+        }}
+      >
+        Share Table
       </Button>
       <BarChart
         dataset={graphData}
