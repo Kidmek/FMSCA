@@ -40,12 +40,7 @@ const formatDate = (date: string) => {
   }
 }
 
-const headers: GridColDef<TruckingCompany>[] = [
-  {
-    width: 200,
-    headerName: 'ID',
-    field: 'id',
-  },
+export const headers: GridColDef<TruckingCompany>[] = [
   {
     width: 200,
     headerName: 'Created_DT',

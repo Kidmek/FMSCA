@@ -1,4 +1,5 @@
 import {
+  Button,
   CircularProgress,
   ListItemIcon,
   ListItemText,
@@ -23,6 +24,7 @@ import {
   useCallback,
 } from 'react'
 import useTableState from '../hoooks/useTableState'
+import { useNavigate } from 'react-router-dom'
 
 const chartSetting = {
   xAxis: [
@@ -45,6 +47,7 @@ const STORAGE_KEY = {
 }
 
 const TableView = () => {
+  const navigate = useNavigate()
   const apiRef = useGridApiRef()
   const { columns, rows, setColumns } = useTableState()
   const [initialState, setInitialState] = useState()
@@ -184,7 +187,6 @@ const TableView = () => {
       const reorderedColumns = (JSON.parse(columnsFromLocalStorage) as string[])
         .map((field) => columns.find((col) => col.field === field))
         .filter((col) => col !== undefined)
-      console.log(reorderedColumns, columnsFromLocalStorage)
       setColumns(reorderedColumns)
     }
 
@@ -221,6 +223,13 @@ const TableView = () => {
         gap: '4rem',
       }}
     >
+      <Button
+        variant='contained'
+        color='primary'
+        onClick={() => navigate('/pivot')}
+      >
+        Go to Pivot View
+      </Button>
       <BarChart
         dataset={graphData}
         yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
