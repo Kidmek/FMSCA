@@ -43,18 +43,12 @@ const headers: GridColDef<TruckingCompany>[] = [
     headerName: 'Created_DT',
     field: 'created_dt',
     valueGetter: formatDate,
-    renderHeader: (params) => {
-      return <strong>{params.colDef.headerName}</strong>
-    },
   },
   {
     width: 200,
     headerName: 'Modified_DT',
     field: 'data_source_modified_dt',
     valueGetter: formatDate,
-    renderHeader: (params) => {
-      return <strong>{params.colDef.headerName}</strong>
-    },
   },
   { width: 100, headerName: 'Entity', field: 'entity_type' },
   { width: 150, headerName: 'Operating status', field: 'operating_status' },
