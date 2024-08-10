@@ -1,137 +1,136 @@
-import { useState, useEffect } from 'react'
-import { parse } from 'papaparse'
-import { GridColDef } from '@mui/x-data-grid'
+import { useState, useEffect } from "react";
+import { parse } from "papaparse";
+import { GridColDef } from "@mui/x-data-grid";
 
 export type TruckingCompany = {
-  created_dt: string
-  data_source_modified_dt: string
-  entity_type: string
-  operating_status: string
-  legal_name: string
-  dba_name: string
-  physical_address: string
-  p_street: string
-  p_city: string
-  p_state: string
-  p_zip_code: string
-  phone: string
-  mailing_address: string
-  m_street: string
-  m_city: string
-  m_state: string
-  m_zip_code: string
-  usdot_number: string
-  mc_mx_ff_number: string
-  power_units: string
-  mcs_150_form_date: string
-  out_of_service_date: string
-  state_carrier_id_number: string
-  duns_number: string
-  drivers: string
-  mcs_150_mileage_year: string
-  id: string
-  credit_score: string
-  record_status: string
-}
+  created_dt: string;
+  data_source_modified_dt: string;
+  entity_type: string;
+  operating_status: string;
+  legal_name: string;
+  dba_name: string;
+  physical_address: string;
+  p_street: string;
+  p_city: string;
+  p_state: string;
+  p_zip_code: string;
+  phone: string;
+  mailing_address: string;
+  m_street: string;
+  m_city: string;
+  m_state: string;
+  m_zip_code: string;
+  usdot_number: string;
+  mc_mx_ff_number: string;
+  power_units: string;
+  mcs_150_form_date: string;
+  out_of_service_date: string;
+  state_carrier_id_number: string;
+  duns_number: string;
+  drivers: string;
+  mcs_150_mileage_year: string;
+  id: string;
+  credit_score: string;
+  record_status: string;
+};
 const formatDate = (date: string) => {
-  const dateObj = new Date(date)
+  const dateObj = new Date(date);
   if (dateObj.getTime()) {
-    return new Date(date)
+    return new Date(date);
   }
-}
+};
 
 export const headers: GridColDef<TruckingCompany>[] = [
   {
     width: 200,
-    headerName: 'Created_DT',
-    field: 'created_dt',
+    headerName: "Created_DT",
+    field: "created_dt",
     valueGetter: formatDate,
     editable: true,
-    type: 'dateTime',
+    type: "dateTime",
   },
   {
     width: 200,
-    headerName: 'Modified_DT',
-    field: 'data_source_modified_dt',
+    headerName: "Modified_DT",
+    field: "data_source_modified_dt",
     valueGetter: formatDate,
     editable: true,
-    type: 'dateTime',
+    type: "dateTime",
   },
-  { width: 100, headerName: 'Entity', field: 'entity_type', editable: true },
+  { width: 100, headerName: "Entity", field: "entity_type", editable: true },
   {
     width: 150,
-    headerName: 'Operating status',
-    field: 'operating_status',
+    headerName: "Operating status",
+    field: "operating_status",
     editable: true,
   },
-  { width: 200, headerName: 'Legal name', field: 'legal_name', editable: true },
-  { width: 200, headerName: 'DBA name', field: 'dba_name', editable: true },
+  { width: 200, headerName: "Legal name", field: "legal_name", editable: true },
+  { width: 200, headerName: "DBA name", field: "dba_name", editable: true },
   {
     width: 200,
-    headerName: 'Physical address',
-    field: 'physical_address',
+    headerName: "Physical address",
+    field: "physical_address",
     editable: true,
   },
   {
     width: 150,
-    headerName: 'Phone',
-    field: 'phone',
+    headerName: "Phone",
+    field: "phone",
     editable: true,
-    type: 'number',
+    type: "number",
   },
   {
     width: 100,
-    headerName: 'DOT',
-    field: 'usdot_number',
+    headerName: "DOT",
+    field: "usdot_number",
     editable: true,
-    type: 'number',
+    type: "number",
   },
   {
     width: 100,
-    headerName: 'MC/MX/FF',
-    field: 'mc_mx_ff_number',
+    headerName: "MC/MX/FF",
+    field: "mc_mx_ff_number",
     editable: true,
-    type: 'custom',
+    type: "custom",
   },
   {
     width: 100,
-    headerName: 'Power units',
-    field: 'power_units',
+    headerName: "Power units",
+    field: "power_units",
     editable: true,
-    type: 'number',
+    type: "number",
   },
   {
     width: 200,
-    headerName: 'Out of service date',
-    field: 'out_of_service_date',
+    headerName: "Out of service date",
+    field: "out_of_service_date",
     editable: true,
     valueGetter: formatDate,
-    type: 'date',
+    type: "date",
   },
-]
+];
 
 const useTableState = () => {
-  const [columns, setColumns] = useState(headers)
-  const [rows, setRows] = useState<TruckingCompany[]>([])
+  const [columns, setColumns] = useState(headers);
+  const [rows, setRows] = useState<TruckingCompany[]>([]);
 
   useEffect(() => {
-    console.log('Table State Use Effect', rows.length)
     if (!rows.length) {
-      parse('/data.csv', {
+      parse("/data.csv", {
         header: true,
         download: true,
         complete: (results) => {
-          setRows(results.data as TruckingCompany[])
-          console.log(results)
+          setRows(results.data as TruckingCompany[]);
+          setColumns(headers);
         },
         error: (error) => {
-          console.error('Error parsing CSV:', error)
+          console.error("Error parsing CSV:", error);
         },
-      })
+      });
     }
-  }, [])
+  }, []);
 
-  return { columns, rows, setColumns }
-}
+  return { columns, rows, setColumns };
+};
 
-export default useTableState
+export default useTableState;
